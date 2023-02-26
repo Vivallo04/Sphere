@@ -1,4 +1,4 @@
-package org.sphere;
+package com.sphere;
 
 public class Main {
     public static void main(String[] args) {
