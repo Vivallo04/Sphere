@@ -1,4 +1,4 @@
-# Arduino Sphere
+# Sphere : Programming Language
 
 _description..._
 
@@ -7,10 +7,10 @@ _description..._
 ## About the Project
 
 ### Authors
-- [Fabian J. Castillo Cerdas](https://github.com/)
+- [Fabian J. Castillo Cerdas](https://github.com/FabianCC26)
 - [Valerie M. Hernández Fernández](https://github.com/valeriehernandez-7)
-- [Oscar M. Soto Varela](https://github.com/)
-- [Andres Vivallo Hurtado](https://github.com/)
+- [Oscar M. Soto Varela](https://github.com/CAMANEM)
+- [Andres Vivallo Hurtado](https://github.com/Vivallo04)
 
 ### University
 [Costa Rica Institute of Technology](https://www.tec.ac.cr/)
