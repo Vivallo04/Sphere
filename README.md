@@ -1,18 +1,8 @@
-# Sphere
-
-## About the Language : Sphere
+# Sphere : Programming Language
 
 _description..._
 
-> Check out the full version of [Sphere](https://github.com/valeriehernandez-7/Sphere/tree/main/sphere)
-
-
-## About the Bot : Sphere-T
-
-_description..._
-
-> Check out the full version of [Sphere-T](https://github.com/valeriehernandez-7/Sphere/tree/main/sphere-t)
-
+## Requirements
 
 ## About the Project
 
