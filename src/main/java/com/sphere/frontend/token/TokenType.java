@@ -1,0 +1,31 @@
+package com.sphere.frontend.token;
+
+public enum TokenType {
+    EOF,
+    NEWLINE,
+    NUMBER,
+    IDENT,
+    STRING,
+    LABEL,
+    GOTO,
+    PRINT,
+    INPUT,
+    LET,
+    IF,
+    THEN,
+    ENDIF,
+    WHILE,
+    REPEAT,
+    ENDWHILE,
+    EQ,
+    PLUS,
+    MINUS,
+    ASTERISK,
+    SLASH,
+    EQEQ,
+    NOTEQ,
+    LT,
+    LTEQ,
+    GT,
+    GTEQ
+}
