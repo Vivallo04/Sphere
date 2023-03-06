@@ -1,6 +1,7 @@
 package com.sphere.frontend.lexer;
 
 import com.sphere.frontend.token.TokenType;
+import com.sphere.util.Utils;
 
 public class Lexer implements ILexer {
     public final String source;
@@ -100,6 +101,58 @@ public class Lexer implements ILexer {
                 abort("Expected !=. But got !" + peek());
             }
 
+        } else if (this.currentCharacter == '\"') {
+            // Get the characters between the quotations
+            nextCharacter();
+            int startPosition = currentPosition;
+            System.out.println(startPosition);
+
+            while (this.currentCharacter != '\"') {
+                if (currentCharacter == '\r' || currentCharacter == '\n' || currentCharacter == '\t'
+                || currentCharacter == '\\' || currentCharacter == '%') {
+                    abort("Illegal character in the string");
+                }
+                nextCharacter();
+            }
+
+            String tokenText = this.source.substring(startPosition, currentPosition);
+            token = new Token(tokenText, TokenType.STRING);
+    
+        } else if (Character.isDigit(currentCharacter)) {
+            int startPosition = currentPosition;
+
+            while (Character.isDigit(peek())) {
+                nextCharacter();
+            }
+            // Is DECIMAL
+            if (peek() == '.') {
+                nextCharacter();
+                if (!Character.isDigit(peek())) {
+                    abort("Illegal character in the number");
+                }
+                while(Character.isDigit(peek())) {
+                    nextCharacter();
+                }
+            }
+            String tokenText = this.source.substring(startPosition, currentPosition + 1);
+            token = new Token(tokenText, TokenType.NUMBER);
+            
+        } else if (Character.isAlphabetic(currentCharacter)) {
+            int startPosition = currentPosition;
+            while (Utils.isAlphanumeric(currentCharacter)) {
+                nextCharacter();
+            }
+
+            String tokenText = this.source.substring(startPosition, currentPosition + 1);
+            TokenType keyword = Token.checkIfKeyword(tokenText);
+            if (keyword == null) {
+                // Identifier
+                token = new Token(tokenText, TokenType.IDENT);
+            } else {
+                // Keyword
+                token = new Token(tokenText, keyword);
+            }
+            
         } else if (this.currentCharacter == '\n') {
             token  = new Token(this.currentCharacter, TokenType.NEWLINE);
         } else if (this.currentCharacter == '\0') {
