@@ -46,12 +46,17 @@ public class Lexer implements ILexer {
 
     @Override
     public void skipComment() {
-
+        if (currentCharacter == '#') {
+            while (currentCharacter != '\n') {
+                nextCharacter();
+            }
+        }
     }
 
     @Override
     public Token getToken() {
         skipWhiteSpace();
+        skipComment();
         Token token = null;
         if (this.currentCharacter == '+') {
             token = new Token(this.currentCharacter, TokenType.PLUS);
