@@ -6,8 +6,7 @@ import com.sphere.frontend.token.TokenType;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
-        String source = "+- */ >>= = !=";
+        String source = "+-123 9.8654*/";
 
         Lexer lexer = new Lexer(source);
         Token token = lexer.getToken();
