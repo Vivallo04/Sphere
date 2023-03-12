@@ -2,8 +2,9 @@ package com.sphere.frontend.lexer;
 
 import com.sphere.frontend.token.TokenType;
 
-public class Token {
+import java.util.Arrays;
 
+public class Token {
     private char tokenText;
     private String tokenString;
     private final TokenType type;
@@ -24,11 +25,10 @@ public class Token {
     }
 
     public static TokenType checkIfKeyword(String tokenText) {
-        for (TokenType kind : TokenType.values()) {
-            // Relies on all keyword enum values being 1XX.
-            /* if (kind.name().equals(tokenText) && kind == "" && kind.value() < 200) {
+        for (TokenType kind : Arrays.stream(TokenType.values()).toList()) {
+            if (kind.name().equals(tokenText) && kind.value >= 100 && kind.value < 200) {
                 return kind;
-            }*/
+            }
         }
         return null;
     }
