@@ -105,7 +105,6 @@ public class Lexer implements ILexer {
             // Get the characters between the quotations
             nextCharacter();
             int startPosition = currentPosition;
-            System.out.println(startPosition);
 
             while (this.currentCharacter != '\"') {
                 if (currentCharacter == '\r' || currentCharacter == '\n' || currentCharacter == '\t'
@@ -136,14 +135,14 @@ public class Lexer implements ILexer {
             }
             String tokenText = this.source.substring(startPosition, currentPosition + 1);
             token = new Token(tokenText, TokenType.NUMBER);
-            
+
         } else if (Character.isAlphabetic(currentCharacter)) {
             int startPosition = currentPosition;
             while (Utils.isAlphanumeric(currentCharacter)) {
                 nextCharacter();
             }
 
-            String tokenText = this.source.substring(startPosition, currentPosition + 1);
+            String tokenText = this.source.substring(startPosition, currentPosition);
             TokenType keyword = Token.checkIfKeyword(tokenText);
             if (keyword == null) {
                 // Identifier
