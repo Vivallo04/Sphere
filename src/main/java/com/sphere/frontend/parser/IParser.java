@@ -1,11 +1,11 @@
 package com.sphere.frontend.parser;
 
-import com.sphere.frontend.lexer.Token;
+import com.sphere.frontend.token.TokenType;
 
 public interface IParser {
-    boolean checkToken(Token kind);
-    boolean checkPeek(Token kind);
-    void match(Token kind);
+    boolean checkToken(TokenType kind);
+    boolean checkPeek(TokenType kind);
+    void match(TokenType kind);
     void nextToken();
     boolean isComparisonOperator();
     void program();
