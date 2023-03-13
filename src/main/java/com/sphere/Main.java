@@ -30,9 +30,11 @@ public class Main {
         try {
             BufferedReader reader = new BufferedReader(new FileReader(args[0]));
             String line;
+            StringBuilder sourceBuilder = new StringBuilder(source);
             while ((line = reader.readLine()) != null) {
-                source += line + "\n";
+                sourceBuilder.append(line).append("\n");
             }
+            source = sourceBuilder.toString();
             reader.close();
 
         } catch (IOException e) {
