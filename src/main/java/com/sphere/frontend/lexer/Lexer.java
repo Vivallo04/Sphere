@@ -4,9 +4,11 @@ import com.sphere.frontend.token.TokenType;
 import com.sphere.util.Utils;
 
 public class Lexer implements ILexer {
+
     public final String source;
     private char currentCharacter;
     private int currentPosition;
+
     public Lexer(String source) {
         this.source = source;
         this.currentCharacter = ' ';
@@ -40,7 +42,7 @@ public class Lexer implements ILexer {
 
     @Override
     public void skipWhiteSpace() {
-        while(this.currentCharacter  == ' ' || this.currentCharacter == '\t' || this.currentCharacter == '\r') {
+        while (this.currentCharacter == ' ' || this.currentCharacter == '\t' || this.currentCharacter == '\r') {
             nextCharacter();
         }
     }
@@ -59,14 +61,19 @@ public class Lexer implements ILexer {
         skipWhiteSpace();
         skipComment();
         Token token = null;
+
         if (this.currentCharacter == '+') {
             token = new Token(this.currentCharacter, TokenType.PLUS);
+
         } else if (this.currentCharacter == '-') {
-            token  = new Token(this.currentCharacter, TokenType.MINUS);
+            token = new Token(this.currentCharacter, TokenType.MINUS);
+
         } else if (this.currentCharacter == '*') {
-            token  = new Token(this.currentCharacter, TokenType.ASTERISK);
+            token = new Token(this.currentCharacter, TokenType.ASTERISK);
+
         } else if (this.currentCharacter == '/') {
-            token  = new Token(this.currentCharacter, TokenType.SLASH);
+            token = new Token(this.currentCharacter, TokenType.SLASH);
+
         } else if (this.currentCharacter == '=') {
             if (peek() == '=') {
                 char lastCharacter = this.currentCharacter;
@@ -75,6 +82,7 @@ public class Lexer implements ILexer {
             } else {
                 token = new Token(currentCharacter, TokenType.EQ);
             }
+
         } else if (this.currentCharacter == '>') {
             if (peek() == '=') {
                 char lastCharacter = this.currentCharacter;
@@ -83,6 +91,7 @@ public class Lexer implements ILexer {
             } else {
                 token = new Token(currentCharacter, TokenType.GT);
             }
+
         } else if (this.currentCharacter == '<') {
             if (peek() == '=') {
                 char lastCharacter = this.currentCharacter;
@@ -108,7 +117,7 @@ public class Lexer implements ILexer {
 
             while (this.currentCharacter != '\"') {
                 if (currentCharacter == '\r' || currentCharacter == '\n' || currentCharacter == '\t'
-                || currentCharacter == '\\' || currentCharacter == '%') {
+                        || currentCharacter == '\\' || currentCharacter == '%') {
                     abort("Illegal character in the string");
                 }
                 nextCharacter();
@@ -116,7 +125,7 @@ public class Lexer implements ILexer {
 
             String tokenText = this.source.substring(startPosition, currentPosition);
             token = new Token(tokenText, TokenType.STRING);
-    
+
         } else if (Character.isDigit(currentCharacter)) {
             int startPosition = currentPosition;
 
@@ -129,7 +138,7 @@ public class Lexer implements ILexer {
                 if (!Character.isDigit(peek())) {
                     abort("Illegal character in the number");
                 }
-                while(Character.isDigit(peek())) {
+                while (Character.isDigit(peek())) {
                     nextCharacter();
                 }
             }
@@ -152,13 +161,13 @@ public class Lexer implements ILexer {
                 // Keyword
                 token = new Token(tokenText, keyword);
             }
-            
+
         } else if (this.currentCharacter == '\n') {
             // Newline
-            token  = new Token('\n', TokenType.NEWLINE);
+            token = new Token('\n', TokenType.NEWLINE);
         } else if (this.currentCharacter == '\0') {
             // EOF
-            token  = new Token(' ', TokenType.EOF);
+            token = new Token(' ', TokenType.EOF);
         } else {
             // Unknown token
             abort(this.getClass().getName() + " Unknown token: " + this.currentCharacter);

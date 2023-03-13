@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Main {
+
     public static void main(String[] args) {
         System.out.println("Crypton Compiler");
         String source = "IF+-123 foo*THEN/";
