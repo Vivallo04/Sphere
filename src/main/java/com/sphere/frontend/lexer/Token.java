@@ -20,10 +20,6 @@ public class Token {
         this.type = tokenType;
     }
 
-    public TokenType getType() {
-        return type;
-    }
-
     public static TokenType checkIfKeyword(String tokenText) {
         for (TokenType kind : Arrays.stream(TokenType.values()).toList()) {
             if (kind.name().equals(tokenText) && kind.value >= 100 && kind.value < 200) {
@@ -33,4 +29,15 @@ public class Token {
         return null;
     }
 
+    public TokenType getType() {
+        return type;
+    }
+
+    public String getTokenString() {
+        return tokenString;
+    }
+
+    public char getTokenText() {
+        return tokenText;
+    }
 }
