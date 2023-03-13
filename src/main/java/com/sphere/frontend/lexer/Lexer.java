@@ -137,6 +137,7 @@ public class Lexer implements ILexer {
             token = new Token(tokenText, TokenType.NUMBER);
 
         } else if (Character.isAlphabetic(currentCharacter)) {
+
             int startPosition = currentPosition;
             while (Utils.isAlphanumeric(currentCharacter)) {
                 nextCharacter();
@@ -153,9 +154,11 @@ public class Lexer implements ILexer {
             }
             
         } else if (this.currentCharacter == '\n') {
-            token  = new Token(this.currentCharacter, TokenType.NEWLINE);
+            // Newline
+            token  = new Token('\n', TokenType.NEWLINE);
         } else if (this.currentCharacter == '\0') {
-            token  = new Token(this.currentCharacter, TokenType.EOF);
+            // EOF
+            token  = new Token(' ', TokenType.EOF);
         } else {
             // Unknown token
             abort(this.getClass().getName() + " Unknown token: " + this.currentCharacter);
