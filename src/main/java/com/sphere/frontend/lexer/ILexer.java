@@ -1,5 +1,7 @@
 package com.sphere.frontend.lexer;
 
+import com.sphere.frontend.token.Token;
+
 public interface ILexer {
 
     void nextCharacter();
