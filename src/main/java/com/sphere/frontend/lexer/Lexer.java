@@ -1,28 +1,32 @@
 package com.sphere.frontend.lexer;
 
+import com.sphere.frontend.token.Token;
 import com.sphere.frontend.token.TokenType;
 import com.sphere.util.Utils;
 
 public class Lexer implements ILexer {
 
     public final String source;
-    private char currentCharacter;
+    private String currentCharacter;
     private int currentPosition;
 
     public Lexer(String source) {
-        this.source = source;
-        this.currentCharacter = ' ';
+        this.source = source + '\n';
+        this.currentCharacter = "";
         this.currentPosition = -1;
         this.nextCharacter();
     }
 
+    /***
+     * Process the next character
+     */
     @Override
     public void nextCharacter() {
         this.currentPosition += 1;
-        if (this.currentPosition >= this.source.length()) {
-            this.currentCharacter = '\0';
+        if (currentPosition >= source.length()) {
+            currentCharacter = String.valueOf('\0'); // EOF
         } else {
-            this.currentCharacter = this.source.charAt(this.currentPosition);
+            currentCharacter = String.valueOf(this.source.charAt(this.currentPosition));
         }
     }
 
@@ -42,15 +46,17 @@ public class Lexer implements ILexer {
 
     @Override
     public void skipWhiteSpace() {
-        while (this.currentCharacter == ' ' || this.currentCharacter == '\t' || this.currentCharacter == '\r') {
+        while (currentCharacter.equals(String.valueOf(' ')) ||
+                currentCharacter.equals(String.valueOf('\t')) ||
+                currentCharacter.equals(String.valueOf('\r'))) {
             nextCharacter();
         }
     }
 
     @Override
     public void skipComment() {
-        if (currentCharacter == '#') {
-            while (currentCharacter != '\n') {
+        if (currentCharacter.equals(String.valueOf('#'))) {
+            while (!currentCharacter.equals(String.valueOf('\n'))) {
                 nextCharacter();
             }
         }
@@ -62,62 +68,65 @@ public class Lexer implements ILexer {
         skipComment();
         Token token = null;
 
-        if (this.currentCharacter == '+') {
+        if (currentCharacter.equals(String.valueOf('+'))) {
             token = new Token(this.currentCharacter, TokenType.PLUS);
 
-        } else if (this.currentCharacter == '-') {
+        } else if (currentCharacter.equals(String.valueOf('-'))) {
             token = new Token(this.currentCharacter, TokenType.MINUS);
 
-        } else if (this.currentCharacter == '*') {
+        } else if (currentCharacter.equals(String.valueOf('*'))) {
             token = new Token(this.currentCharacter, TokenType.ASTERISK);
 
-        } else if (this.currentCharacter == '/') {
+        } else if (currentCharacter.equals(String.valueOf('/'))) {
             token = new Token(this.currentCharacter, TokenType.SLASH);
 
-        } else if (this.currentCharacter == '=') {
+        } else if (currentCharacter.equals(String.valueOf('='))) {
             if (peek() == '=') {
-                char lastCharacter = this.currentCharacter;
+                String lastCharacter = this.currentCharacter;
                 nextCharacter();
-                token = new Token((char) (lastCharacter + currentCharacter), TokenType.EQEQ);
+                token = new Token(lastCharacter + currentCharacter, TokenType.EQEQ);
             } else {
                 token = new Token(currentCharacter, TokenType.EQ);
             }
 
-        } else if (this.currentCharacter == '>') {
+        } else if (currentCharacter.equals(String.valueOf('>'))) {
             if (peek() == '=') {
-                char lastCharacter = this.currentCharacter;
+                String lastCharacter = this.currentCharacter;
                 nextCharacter();
-                token = new Token((char) (lastCharacter + currentCharacter), TokenType.GTEQ);
+                token = new Token(lastCharacter + currentCharacter, TokenType.GTEQ);
             } else {
                 token = new Token(currentCharacter, TokenType.GT);
             }
 
-        } else if (this.currentCharacter == '<') {
+        } else if (currentCharacter.equals(String.valueOf('<'))) {
             if (peek() == '=') {
-                char lastCharacter = this.currentCharacter;
+                String lastCharacter = this.currentCharacter;
                 nextCharacter();
-                token = new Token((char) (lastCharacter + currentCharacter), TokenType.LTEQ);
+                token = new Token(lastCharacter + currentCharacter, TokenType.LTEQ);
             } else {
                 token = new Token(currentCharacter, TokenType.LT);
             }
 
-        } else if (this.currentCharacter == '!') {
+        } else if (currentCharacter.equals(String.valueOf('!'))) {
             if (peek() == '=') {
-                char lastCharacter = this.currentCharacter;
+                String lastCharacter = this.currentCharacter;
                 nextCharacter();
-                token = new Token((char) (lastCharacter + currentCharacter), TokenType.NOTEQ);
+                token = new Token(lastCharacter + currentCharacter, TokenType.NOTEQ);
             } else {
                 abort("Expected !=. But got !" + peek());
             }
 
-        } else if (this.currentCharacter == '\"') {
+        } else if (currentCharacter.equals(String.valueOf('\"'))) {
             // Get the characters between the quotations
             nextCharacter();
             int startPosition = currentPosition;
 
-            while (this.currentCharacter != '\"') {
-                if (currentCharacter == '\r' || currentCharacter == '\n' || currentCharacter == '\t'
-                        || currentCharacter == '\\' || currentCharacter == '%') {
+            while (!currentCharacter.equals(String.valueOf('\"'))) {
+                if (currentCharacter.equals(String.valueOf('\r')) ||
+                        currentCharacter.equals(String.valueOf('\n')) ||
+                        currentCharacter.equals(String.valueOf('\t')) ||
+                        currentCharacter.equals(String.valueOf('\\')) ||
+                        currentCharacter.equals(String.valueOf('%'))) {
                     abort("Illegal character in the string");
                 }
                 nextCharacter();
@@ -126,7 +135,7 @@ public class Lexer implements ILexer {
             String tokenText = this.source.substring(startPosition, currentPosition);
             token = new Token(tokenText, TokenType.STRING);
 
-        } else if (Character.isDigit(currentCharacter)) {
+        } else if (Utils.isDigit(currentCharacter)) {
             int startPosition = currentPosition;
 
             while (Character.isDigit(peek())) {
@@ -145,9 +154,9 @@ public class Lexer implements ILexer {
             String tokenText = this.source.substring(startPosition, currentPosition + 1);
             token = new Token(tokenText, TokenType.NUMBER);
 
-        } else if (Character.isAlphabetic(currentCharacter)) {
-
+        } else if (Utils.isAlphabetic(currentCharacter)) {
             int startPosition = currentPosition;
+
             while (Utils.isAlphanumeric(currentCharacter)) {
                 nextCharacter();
             }
@@ -162,25 +171,27 @@ public class Lexer implements ILexer {
                 token = new Token(tokenText, keyword);
             }
 
-        } else if (this.currentCharacter == '\n') {
+        } else if (currentCharacter.equals(System.lineSeparator())) {
             // Newline
-            token = new Token('\n', TokenType.NEWLINE);
-        } else if (this.currentCharacter == '\0') {
+            token = new Token(String.valueOf('\n'), TokenType.NEWLINE);
+
+        } else if (currentCharacter.equals(String.valueOf('\0'))) {
             // EOF
-            token = new Token(' ', TokenType.EOF);
+            token = new Token(String.valueOf(' '), TokenType.NEWLINE);
+
         } else {
             // Unknown token
-            abort(this.getClass().getName() + " Unknown token: " + this.currentCharacter);
+            token = new Token(String.valueOf(' '), TokenType.EOF);
         }
         this.nextCharacter();
         return token;
     }
 
-    public char getCurrentCharacter() {
+    public String getCurrentCharacter() {
         return currentCharacter;
     }
 
     public void setCurrentCharacter(char currentCharacter) {
-        this.currentCharacter = currentCharacter;
+        this.currentCharacter = String.valueOf(currentCharacter);
     }
 }

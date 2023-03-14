@@ -2,7 +2,7 @@ package com.sphere.frontend.parser;
 
 import com.sphere.backend.Emitter;
 import com.sphere.frontend.lexer.Lexer;
-import com.sphere.frontend.lexer.Token;
+import com.sphere.frontend.token.Token;
 import com.sphere.frontend.token.TokenType;
 
 import java.util.HashSet;
@@ -13,7 +13,6 @@ public class Parser implements IParser {
 
     private final Lexer lexer;
     private final Emitter emitter;
-
     private final HashSet<String> symbols;
     private final HashSet<String> labelsDeclared;
     private final HashSet<String> labelsGoto;
@@ -48,7 +47,7 @@ public class Parser implements IParser {
     // Try to match current token. If not, error. Advances the current token.
     public void match(TokenType kind) {
         if (!checkToken(kind)) {
-            abort("Expected " + kind.getClass().getName() + ", got " + currentToken.getType().name());
+            abort("Expected " + kind + ", got " + currentToken.getType().name());
         }
         nextToken();
     }
@@ -62,7 +61,8 @@ public class Parser implements IParser {
 
     // Return true if the current token is a comparison operator.
     public boolean isComparisonOperator() {
-        return checkToken(TokenType.GT) || checkToken(TokenType.GTEQ) || checkToken(TokenType.LT) || checkToken(TokenType.LTEQ) || checkToken(TokenType.EQEQ) || checkToken(TokenType.NOTEQ);
+        return checkToken(TokenType.GT) || checkToken(TokenType.GTEQ) || checkToken(TokenType.LT) ||
+                checkToken(TokenType.LTEQ) || checkToken(TokenType.EQEQ) || checkToken(TokenType.NOTEQ);
     }
 
     public void abort(String message) {
@@ -74,7 +74,6 @@ public class Parser implements IParser {
 
     // program ::= {statement}
     public void program() {
-        System.out.println("PROGRAM");
 
         this.emitter.headerLine("#include <stdio.h>");
         this.emitter.headerLine("int main(void) {");
@@ -103,15 +102,13 @@ public class Parser implements IParser {
     // One of the following statements...
     public void statement() {
         // Check the first token to see what kind of statement this is.
-
         // "PRINT" (expression | string)
         if (checkToken(TokenType.PRINT)) {
-            System.out.println("STATEMENT-PRINT");
             this.nextToken();
 
             if (checkToken(TokenType.STRING)) {
                 // Simple string.
-                this.emitter.emitLine("printf(\"" + this.currentToken.getTokenString() + "\\n\");");
+                this.emitter.emitLine("printf(\"" + this.currentToken.getTokenText() + "\\n\");");
                 this.nextToken();
 
             } else {
@@ -124,7 +121,6 @@ public class Parser implements IParser {
 
         // "IF" comparison "THEN" {statement} "ENDIF"
         else if (checkToken(TokenType.IF)) {
-            System.out.println("STATEMENT-IF");
             this.nextToken();
             emitter.emit("if(");
             this.comparison();
@@ -144,7 +140,6 @@ public class Parser implements IParser {
 
         // "WHILE" comparison "REPEAT" {statement} "ENDWHILE"
         else if (checkToken(TokenType.WHILE)) {
-            System.out.println("STATEMENT-WHILE");
             this.nextToken();
             emitter.emit("while(");
             this.comparison();
@@ -161,62 +156,58 @@ public class Parser implements IParser {
         }
 
         // "LABEL" ident
-        else if (this.checkToken(TokenType.LABEL)) {
-            System.out.println("STATEMENT-LABEL");
+        else if (checkToken(TokenType.LABEL)) {
             this.nextToken();
 
             // Make sure this label doesn't already exist
-            if (labelsDeclared.contains(this.currentToken.getTokenString())) {
+            if (labelsDeclared.contains(this.currentToken.getTokenText())) {
                 abort("Label already exists: " + this.currentToken.getTokenText());
             }
 
-            this.labelsDeclared.add(this.currentToken.getTokenString());
-            emitter.emitLine(this.currentToken.getTokenString() + ":");
+            this.labelsDeclared.add(this.currentToken.getTokenText());
+            emitter.emitLine(this.currentToken.getTokenText() + ":");
             match(TokenType.IDENT);
 
         } else if (this.checkToken(TokenType.GOTO)) {
-            System.out.println("STATEMENT-GOTO");
             this.nextToken();
-            this.labelsGoto.add(this.currentToken.getTokenString());
-            emitter.emitLine("goto " + currentToken.getTokenString() + ";");
+            this.labelsGoto.add(this.currentToken.getTokenText());
+            emitter.emitLine("goto " + currentToken.getTokenText() + ";");
             match(TokenType.IDENT);
 
         } else if (this.checkToken(TokenType.LET)) {
-            System.out.println("STATEMENT-LET");
             this.nextToken();
 
             // Check if ident exists in symbol table. If not, declare it
-            if (!symbols.contains(this.currentToken.getTokenString())) {
-                symbols.add(this.currentToken.getTokenString());
-                emitter.headerLine("float" + currentToken.getTokenString() + ";");
+            if (!symbols.contains(this.currentToken.getTokenText())) {
+                symbols.add(this.currentToken.getTokenText());
+                emitter.headerLine("float" + currentToken.getTokenText() + ";");
             }
 
-            emitter.emit(this.currentToken.getTokenString() + " = ");
+            emitter.emit(this.currentToken.getTokenText() + " = ");
             this.match(TokenType.IDENT);
             this.match(TokenType.EQ);
 
             this.expression();
             emitter.emitLine(";");
 
-        } else if (this.checkToken(TokenType.INPUT)) {
-            System.out.println("STATEMENT-INPUT");
+        } else if (checkToken(TokenType.INPUT)) {
             this.nextToken();
 
             // If variable doesn't already exist, declare it
-            if (!symbols.contains(this.currentToken.getTokenString())) {
-                symbols.add(this.currentToken.getTokenString());
-                emitter.headerLine("float " + this.currentToken.getTokenString() + ";");
+            if (!symbols.contains(this.currentToken.getTokenText())) {
+                symbols.add(this.currentToken.getTokenText());
+                emitter.headerLine("float " + this.currentToken.getTokenText() + ";");
             }
 
             // Emit scanf but also validate the input. If invalid, set the variable to 0 and clear the input.
-            emitter.emitLine("if(0 == scanf(\"%" + "f\", &" + this.currentToken.getTokenString() + ")) {");
-            emitter.emitLine(this.currentToken.getTokenString() + " = 0;");
+            emitter.emitLine("if(0 == scanf(\"%" + "f\", &" + this.currentToken.getTokenText() + ")) {");
+            emitter.emitLine(this.currentToken.getTokenText() + " = 0;");
             emitter.emit("scanf(\"%");
             emitter.emitLine("*s\");");
             emitter.emitLine("}");
             this.match(TokenType.IDENT);
         } else {
-            abort("Invalid statement at: " + this.currentToken.getTokenString() + "(" + this.currentToken.getType().name() + ")");
+            abort("Invalid statement at: " + this.currentToken.getTokenText() + "(" + this.currentToken.getType().name() + ")");
         }
 
         // Newline
@@ -226,19 +217,18 @@ public class Parser implements IParser {
     // comparison ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
     @Override
     public void comparison() {
-        System.out.println("Comparison");
         this.expression();
 
+        // Must be at least one comparison operator and another expression.
         if (this.isComparisonOperator()) {
-            emitter.emit(this.currentToken.getTokenString());
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
             this.expression();
-        } else {
-            abort("Expected comparison operator at: " + this.currentToken.getTokenText());
         }
 
+        // Can have 0 or more comparison operator and expressions.
         while (this.isComparisonOperator()) {
-            emitter.emit(this.currentToken.getTokenString());
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
             this.expression();
         }
@@ -246,12 +236,11 @@ public class Parser implements IParser {
 
     // expression ::= term {( "-" | "+" ) term}
     public void expression() {
-        System.out.println("Expression");
         this.term();
 
         // Can have 0 or more +/- and expressions
-        while (this.checkToken(TokenType.PLUS) || this.checkPeek(TokenType.MINUS)) {
-            emitter.emit(this.currentToken.getTokenString());
+        while (checkToken(TokenType.PLUS) || checkPeek(TokenType.MINUS)) {
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
             this.term();
         }
@@ -259,12 +248,11 @@ public class Parser implements IParser {
 
     // term ::= unary {( "/" | "*" ) unary}
     public void term() {
-        System.out.println("Term");
         this.unary();
 
         // Can have 0 or more *// and expressions.
         while (this.checkToken(TokenType.ASTERISK) || this.checkToken(TokenType.SLASH)) {
-            emitter.emit(this.currentToken.getTokenString());
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
             this.unary();
         }
@@ -272,41 +260,38 @@ public class Parser implements IParser {
 
     // unary ::= ["+" | "-"] primary
     public void unary() {
-        System.out.println("Unary");
-
         // optional unary +/-
         if (this.checkToken(TokenType.PLUS) || this.checkToken(TokenType.MINUS)) {
-            emitter.emit(this.currentToken.getTokenString());
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
         }
         this.primary();
     }
 
     public void primary() {
-        System.out.println("Primary (" + this.currentToken.getTokenString() + ")");
+        System.out.println("Primary (" + this.currentToken.getTokenText() + ")");
 
         if (this.checkToken(TokenType.NUMBER)) {
-            emitter.emit(this.currentToken.getTokenString());
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
+
         } else if (this.checkToken(TokenType.IDENT)) {
 
             // Ensure the variable already exists
-            if (!this.symbols.contains(this.currentToken.getTokenString())) {
-                abort("Referencing a variable before assignment: " + this.currentToken.getTokenString());
+            if (!this.symbols.contains(this.currentToken.getTokenText())) {
+                abort("Referencing a variable before assignment: " + this.currentToken.getTokenText());
             }
 
-            emitter.emit(this.currentToken.getTokenString());
+            emitter.emit(this.currentToken.getTokenText());
             this.nextToken();
         } else {
             // Error!
-            abort("Unexpected token at " + this.currentToken.getTokenString());
+            abort("Unexpected token at " + this.currentToken.getTokenText());
         }
     }
 
     // n1 ::= '\n'
     public void newLine() {
-        System.out.println("New line");
-
         // Require at least one newline
         this.match(TokenType.NEWLINE);
 
