@@ -126,10 +126,12 @@ public class Parser implements IParser {
         else if (checkToken(TokenType.IF)) {
             System.out.println("STATEMENT-IF");
             this.nextToken();
+            emitter.emit("if(");
             this.comparison();
 
             this.match(TokenType.THEN);
-            this.nl();
+            this.newLine();
+            emitter.emitLine("){");
 
             // Zero or more statements in the body.
             while (!checkToken(TokenType.ENDIF)) {
@@ -137,21 +139,25 @@ public class Parser implements IParser {
             }
 
             this.match(TokenType.ENDIF);
+            emitter.emitLine("}");
         }
 
         // "WHILE" comparison "REPEAT" {statement} "ENDWHILE"
         else if (checkToken(TokenType.WHILE)) {
             System.out.println("STATEMENT-WHILE");
             this.nextToken();
+            emitter.emit("while(");
             this.comparison();
 
             this.match(TokenType.REPEAT);
-            this.nl();
+            this.newLine();
+            this.emitter.emitLine("){");
 
             while (!this.checkToken(TokenType.ENDWHILE)) {
                 this.statement();
             }
             this.match(TokenType.ENDWHILE);
+            emitter.emitLine("}");
         }
 
         // "LABEL" ident
@@ -165,13 +171,15 @@ public class Parser implements IParser {
             }
 
             this.labelsDeclared.add(this.currentToken.getTokenString());
-            this.match(TokenType.IDENT);
+            emitter.emitLine(this.currentToken.getTokenString() + ":");
+            match(TokenType.IDENT);
 
         } else if (this.checkToken(TokenType.GOTO)) {
             System.out.println("STATEMENT-GOTO");
             this.nextToken();
             this.labelsGoto.add(this.currentToken.getTokenString());
-            this.match(TokenType.IDENT);
+            emitter.emitLine("goto " + currentToken.getTokenString() + ";");
+            match(TokenType.IDENT);
 
         } else if (this.checkToken(TokenType.LET)) {
             System.out.println("STATEMENT-LET");
@@ -180,12 +188,15 @@ public class Parser implements IParser {
             // Check if ident exists in symbol table. If not, declare it
             if (!symbols.contains(this.currentToken.getTokenString())) {
                 symbols.add(this.currentToken.getTokenString());
+                emitter.headerLine("float" + currentToken.getTokenString() + ";");
             }
 
+            emitter.emit(this.currentToken.getTokenString() + " = ");
             this.match(TokenType.IDENT);
             this.match(TokenType.EQ);
 
             this.expression();
+            emitter.emitLine(";");
 
         } else if (this.checkToken(TokenType.INPUT)) {
             System.out.println("STATEMENT-INPUT");
@@ -194,15 +205,22 @@ public class Parser implements IParser {
             // If variable doesn't already exist, declare it
             if (!symbols.contains(this.currentToken.getTokenString())) {
                 symbols.add(this.currentToken.getTokenString());
+                emitter.headerLine("float " + this.currentToken.getTokenString() + ";");
             }
 
+            // Emit scanf but also validate the input. If invalid, set the variable to 0 and clear the input.
+            emitter.emitLine("if(0 == scanf(\"%" + "f\", &" + this.currentToken.getTokenString() + ")) {");
+            emitter.emitLine(this.currentToken.getTokenString() + " = 0;");
+            emitter.emit("scanf(\"%");
+            emitter.emitLine("*s\");");
+            emitter.emitLine("}");
             this.match(TokenType.IDENT);
         } else {
             abort("Invalid statement at: " + this.currentToken.getTokenString() + "(" + this.currentToken.getType().name() + ")");
         }
 
         // Newline
-        this.nl();
+        this.newLine();
     }
 
     // comparison ::= expression (("==" | "!=" | ">" | ">=" | "<" | "<=") expression)+
@@ -212,6 +230,7 @@ public class Parser implements IParser {
         this.expression();
 
         if (this.isComparisonOperator()) {
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
             this.expression();
         } else {
@@ -219,6 +238,7 @@ public class Parser implements IParser {
         }
 
         while (this.isComparisonOperator()) {
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
             this.expression();
         }
@@ -231,6 +251,7 @@ public class Parser implements IParser {
 
         // Can have 0 or more +/- and expressions
         while (this.checkToken(TokenType.PLUS) || this.checkPeek(TokenType.MINUS)) {
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
             this.term();
         }
@@ -241,7 +262,9 @@ public class Parser implements IParser {
         System.out.println("Term");
         this.unary();
 
+        // Can have 0 or more *// and expressions.
         while (this.checkToken(TokenType.ASTERISK) || this.checkToken(TokenType.SLASH)) {
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
             this.unary();
         }
@@ -253,6 +276,7 @@ public class Parser implements IParser {
 
         // optional unary +/-
         if (this.checkToken(TokenType.PLUS) || this.checkToken(TokenType.MINUS)) {
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
         }
         this.primary();
@@ -262,13 +286,16 @@ public class Parser implements IParser {
         System.out.println("Primary (" + this.currentToken.getTokenString() + ")");
 
         if (this.checkToken(TokenType.NUMBER)) {
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
         } else if (this.checkToken(TokenType.IDENT)) {
+
             // Ensure the variable already exists
             if (!this.symbols.contains(this.currentToken.getTokenString())) {
                 abort("Referencing a variable before assignment: " + this.currentToken.getTokenString());
             }
 
+            emitter.emit(this.currentToken.getTokenString());
             this.nextToken();
         } else {
             // Error!
@@ -277,7 +304,7 @@ public class Parser implements IParser {
     }
 
     // n1 ::= '\n'
-    public void nl() {
+    public void newLine() {
         System.out.println("New line");
 
         // Require at least one newline
