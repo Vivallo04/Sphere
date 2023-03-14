@@ -1,31 +1,11 @@
 # Sphere : Programming Language
 
-_description..._
+Link to the [original repo](https://github.com/AZHenley/teenytinycompiler) made in Python
+All credits due to: Austin Henley
 
-## Requirements
+## Known issues
+- When trying to compile "hello.crpt" it will only compile the frist PRINT statement
+- Parser.java line 296 is commented out since it give an error ("Expected NEWLINE, got EOF")
+- Lexer.java line 164 does not support `current position + 1` that's why the `+ 1` was removed 
 
-## About the Project
-
-### Authors
-- [Fabian J. Castillo Cerdas](https://github.com/FabianCC26)
-- [Valerie M. Hernández Fernández](https://github.com/valeriehernandez-7)
-- [Oscar M. Soto Varela](https://github.com/CAMANEM)
-- [Andres Vivallo Hurtado](https://github.com/Vivallo04)
-
-### University
-[Costa Rica Institute of Technology](https://www.tec.ac.cr/)
-
-### Site
-[Cartago Central Technological Campus](https://www.tec.ac.cr/ubicaciones/campus-tecnologico-central-cartago)
-
-### Degree
-[Computer Engineering](https://www.tec.ac.cr/en/carreras/licentiates-degree-computer-engineering)
-
-### Course
-[CE3104 - Languages, Compilers and Interpreters](https://www.tec.ac.cr/planes-estudio/licenciatura-ingenieria-computadores)
-
-### Assignment
-Project
-
-### Semester
-I 2023
+Any other questions can be made to my email? :)
