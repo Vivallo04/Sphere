@@ -293,7 +293,7 @@ public class Parser implements IParser {
     // n1 ::= '\n'
     public void newLine() {
         // Require at least one newline
-        this.match(TokenType.NEWLINE);
+        //this.match(TokenType.NEWLINE); // This line gives an error
 
         // But we will allow extra newlines too
         while (this.checkToken(TokenType.NEWLINE)) {
