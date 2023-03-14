@@ -1,5 +1,6 @@
 package com.sphere.frontend.parser;
 
+import com.sphere.backend.Emitter;
 import com.sphere.frontend.lexer.Lexer;
 import com.sphere.frontend.lexer.Token;
 import com.sphere.frontend.token.TokenType;
@@ -11,16 +12,27 @@ import java.util.HashSet;
 public class Parser implements IParser {
 
     private final Lexer lexer;
-    private final HashSet<String> symbols = new HashSet<>();
-    private final HashSet<String> labelsDeclared = new HashSet<>();
-    private final HashSet<String> labelsGotoed = new HashSet<>();
+    private final Emitter emitter;
+
+    private final HashSet<String> symbols;
+    private final HashSet<String> labelsDeclared;
+    private final HashSet<String> labelsGoto;
     private Token currentToken;
     private Token peekToken;
 
-    public Parser(Lexer lexer) {
+    public Parser(Lexer lexer, Emitter emitter) {
         this.lexer = lexer;
-        nextToken();
-        nextToken(); // Call this twice to initialize current and peek.
+        this.emitter = emitter;
+
+        symbols = new HashSet<>(); //declared variables
+        labelsDeclared = new HashSet<>();
+        labelsGoto = new HashSet<>();
+
+        this.currentToken = null;
+        this.peekToken = null;
+
+        this.nextToken();
+        this.nextToken(); // Call this twice to initialize current and peek.
     }
 
     // Return true if the current token matches.
@@ -64,6 +76,9 @@ public class Parser implements IParser {
     public void program() {
         System.out.println("PROGRAM");
 
+        this.emitter.headerLine("#include <stdio.h>");
+        this.emitter.headerLine("int main(void) {");
+
         // Since some newlines are required in our grammar, need to skip the excess.
         while (checkToken(TokenType.NEWLINE)) {
             nextToken();
@@ -74,8 +89,11 @@ public class Parser implements IParser {
             statement();
         }
 
+        this.emitter.emitLine("return 0;");
+        this.emitter.emitLine("}");
+
         // Check that each label referenced in a GOTO is declared.
-        for (String label : labelsGotoed) {
+        for (String label : labelsGoto) {
             if (!labelsDeclared.contains(label)) {
                 abort("Attempting to GOTO to undeclared label: " + label);
             }
@@ -93,10 +111,14 @@ public class Parser implements IParser {
 
             if (checkToken(TokenType.STRING)) {
                 // Simple string.
+                this.emitter.emitLine("printf(\"" + this.currentToken.getTokenString() + "\\n\");");
                 this.nextToken();
+
             } else {
                 // Expect an expression.
+                this.emitter.emit("printf(\"%" + ".2f\\n\", (float)(");
                 this.expression();
+                this.emitter.emitLine("));");
             }
         }
 
@@ -148,7 +170,7 @@ public class Parser implements IParser {
         } else if (this.checkToken(TokenType.GOTO)) {
             System.out.println("STATEMENT-GOTO");
             this.nextToken();
-            this.labelsGotoed.add(this.currentToken.getTokenString());
+            this.labelsGoto.add(this.currentToken.getTokenString());
             this.match(TokenType.IDENT);
 
         } else if (this.checkToken(TokenType.LET)) {
