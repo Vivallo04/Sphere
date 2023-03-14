@@ -1,7 +1,7 @@
 # Sphere : Programming Language
 
-Link to the [original repo](https://github.com/AZHenley/teenytinycompiler) made in Python
-All credits due to: Austin Henley
+Link to the [original repo](https://github.com/AZHenley/teenytinycompiler) made in Python.
+**All credits due to: Austin Henley**
 
 ## Known issues
 - When trying to compile "hello.crpt" it will only compile the frist PRINT statement
