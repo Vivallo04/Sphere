@@ -4,25 +4,25 @@ import com.sphere.backend.Emitter;
 import com.sphere.frontend.lexer.Lexer;
 import com.sphere.frontend.parser.Parser;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        System.out.println("Crypton Compiler");
+        System.out.println("Crypton Compiler Started...\n");
 
         String source = readInputFile(args);
 
         Lexer lexer = new Lexer(source);
-        Emitter emitter = new Emitter("out.c");
+        Emitter emitter = new Emitter("src/main/resources/out.c");
         Parser parser = new Parser(lexer, emitter);
 
         parser.program();
         emitter.writeFile();
 
-        System.out.println("Compiling completed");
+
+        System.out.println("Compiling completed!");
     }
 
     private static String readInputFile(String[] args) {
@@ -31,18 +31,19 @@ public class Main {
             System.exit(1);
         }
 
-        String filename = args[0];
-        StringBuilder source = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
-            String line = reader.readLine();
-            while (line != null) {
-                source.append(line);
-                line = reader.readLine();
+        StringBuilder input = new StringBuilder();
+        try {
+            File file = new File(args[0]);
+            Scanner scanner = new Scanner(file);
+
+            while (scanner.hasNextLine()) {
+                input.append(scanner.nextLine()).append("\n");
             }
-        } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
-            System.exit(1);
+            scanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found: " + e.getMessage());
         }
-        return source.toString();
+        System.out.println(input);
+        return String.valueOf(input);
     }
 }
