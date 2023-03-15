@@ -161,7 +161,7 @@ public class Lexer implements ILexer {
                 nextCharacter();
             }
 
-            String tokenText = this.source.substring(startPosition, currentPosition);
+            String tokenText = this.source.substring(startPosition, currentPosition + 1); // This line gives an error when + 1
             TokenType keyword = Token.checkIfKeyword(tokenText);
             if (keyword == null) {
                 // Identifier
