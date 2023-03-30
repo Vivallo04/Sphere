@@ -1,6 +1,6 @@
 $JAVA_HOME = "C:\Program Files\Java\jdk-19" # replace with your Java installation path
 $PROJECT_DIR = "." # replace with the directory containing your project
-$SOURCE = "hello.crpt"
+$SOURCE = "hello.sph"
 
 # compile the project with Gradle
 & "$PROJECT_DIR\gradlew.bat" build
