@@ -1,0 +1,123 @@
+-- Declare a Variable
+Def(@Variable1, integer, 10);
+Def(@Variable2, integer, 120);
+Def(@Variable3, integer);
+Def(@Variable4, boolean, True);
+Def(@Variable5, boolean, False);
+Def(@Variable6, boolean, True);
+
+@Variable1(20);
+@Variable2(-34);
+@Variable4(False);
+@Variable5(True);
+@Variable6(NOT(@Variable5));
+@Variable3(@Variable1 + @Variable2);
+@Variable2(@Variable3 + 10);
+
+-- Alter a numeric variable
+Alter(@Variable1, -4);
+Alter(@Variable2, 10);
+Alter(@Variable3, @Variable1 + @Variable2);
+
+-- Alter a boolean variable
+Not(@Variable4);
+
+-- Is true built-in function
+IsTrue(@Variable4);
+-- Move built-in function (Move the robot) -> Move(Direction);
+Move(ATR);
+Move(ADL);
+Move(ADE);
+Move(AIZ);
+Move(IZQ);
+Move(DER);
+Move(DDE);
+Move(DIZ);
+
+-- Random function (Random Robot Movement) -> Random();
+Random();
+
+
+-- Repeat while True
+Repeat (
+    Def(@Variable1, integer, 10);
+    Def(@Variable2, integer, 120);
+    Break;
+);
+
+-- Repeat until
+Until (
+    Def(@Variable1, integer, 10);
+    Def(@Variable2, integer, 120);
+    Alter(@Variable1, 1);
+) @Variable1 > 100;
+
+-- While loop
+While IsTrue(@Variable4) (
+    Not(@Variable4);
+);
+
+While @Variable1 > 0 (
+    Alter(@Variable1, -1);
+);
+
+-- Case statement
+Case When (@Variable1 > 2) Then (
+    Alter(@Variable1, -1);
+);
+
+Case When (IsTrue(@Variable5)) Then (
+    Alter(@Variable1, 1);
+) Else (
+    Break;
+);
+
+-- Case 2 statement
+Case @variable2
+    When 1 Then (
+        Alter(@Variable1, 1);
+    )
+    When 2 Then (
+        Alter(@Variable1, 2);
+    )
+    When 3 Then (
+        Alter(@Variable1, 3);
+    )
+    Else (
+        Alter(@Variable1, 4);
+    );
+
+Case @variable5
+    When True Then (
+        Alter(@Variable1, 1);
+    )
+    When False Then (
+        Alter(@Variable1, 2);
+    )
+    Else (
+        Alter(@Variable1, 3);
+    );
+
+
+-- Print statement
+=>("Hello World");
+=>(@Variable1);
+=>(@Variable2);
+=>(@Variable3);
+=>(@Variable4);
+=>(NOT(@Variable5));
+=>(IsTrue(@Variable4));
+=>("This is the Sphere language", @Variable1, "made in 2023");
+
+-- Function declaration
+Proc name_of_function (
+    # Code
+);
+
+-- Function call
+Call(name_of_function);
+
+-- If statement
+If IsTrue(@Variable4) (
+    Alter(@Variable1, 1);
+);
