@@ -1,9 +1,11 @@
 plugins {
     id 'java'
+    id 'antlr'
+    id 'idea'
 }
 
 group 'org.sphere'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 repositories {
     mavenCentral()
@@ -11,9 +13,44 @@ repositories {
 
 dependencies {
     implementation 'net.java.dev.javacc:javacc:7.0.12'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    implementation 'org.jetbrains:annotations:24.0.0'
+    antlr 'org.antlr:antlr4:4.12.0'
+    implementation 'org.antlr:antlr4-runtime:4.12.0'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 }
+
+sourceSets {
+    generated {
+        java.srcDir 'generated-src/antlr/main/'
+    }
+}
+compileJava.source sourceSets.generated.java, sourceSets.main.java
+
+generateGrammarSource {
+    maxHeapSize = "128m"
+    arguments += ['-package', 'com.sphere.anltr']
+}
+compileJava.dependsOn generateGrammarSource
+
+idea {
+    module {
+        sourceDirs += file("generated-src/antlr/main/")
+    }
+}
+
+clean{
+    delete "generated-src"
+}
+
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'com.sphere.Main'
+        )
+    }
+}
+
 
 test {
     useJUnitPlatform()

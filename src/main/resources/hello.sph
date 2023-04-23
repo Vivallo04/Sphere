@@ -1,0 +1,16 @@
+Def(@dog, integer);
+Def(@cat, integer, 200);
+Def(@pig, integer, 300);
+Def(@cow, integer, 400);
+Def(@chicken, integer, 500);
+Def(@sheep, boolean, False);
+=>(1243);
+=>("Hello World");
+
+@dog(200);
+
+@Principal (
+
+);
+
+=>(@dog);
