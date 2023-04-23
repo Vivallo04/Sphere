@@ -1,9 +1,15 @@
-$JAVA_HOME = "C:\Program Files\Java\jdk-19" # replace with your Java installation path
-$PROJECT_DIR = "." # replace with the directory containing your project
-$SOURCE = "hello.sph"
+$currentPath = (Get-Location).Path
+Set-Location $currentPath
+Write-Host "Current path: $currentPath"
 
-# compile the project with Gradle
-& "$PROJECT_DIR\gradlew.bat" build
+# Run the Gradle build task to compile your Java program
+.\gradlew jar
 
-# run the Main class
-& "$JAVA_HOME\bin\java" -cp "$PROJECT_DIR\build\classes\java\main; $PROJECT_DIR\build\resources\main; $PROJECT_DIR\build\libs\*" com.sphere.Main $SOURCE
+# Define the path to the compiled Java program (replace "example.jar" with the name of your program)
+$programPath = $currentPath + "\build\libs\Sphere-1.0.jar"
+
+# Define the path to the file you want to pass as a program argument (replace "example.txt" with the name of your file)
+$filePath = $currentPath + "\src\main\resources\hello.sph"
+
+# Run the Java program with the file as a program argument
+& java -jar $programPath $filePath
