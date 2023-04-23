@@ -4,14 +4,12 @@ The Sphere Programming Language is a toy language that compiles to arduino!
 It may not be easier than arduino, but it's a fun project to work on. Its purpose
 is to see the arduino code in a different way. 
 
----
 ## Requirements
 - Java 16 (JDK)
 - Powershell (Windows)
 - Bash (Linux)
 - ANTLR4 (just for development)
 
----
 ## How to use
 ### Windows or Linux
 
@@ -25,7 +23,7 @@ is to see the arduino code in a different way.
 2. Extract the zip file
 3. Run the `build.ps1` file (Windows) or the `build.sh` file (Linux)
 
----
+
 ## Sphere Syntax
 ### Variables
 

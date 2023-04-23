@@ -1,0 +1,91 @@
+<program> ::= { <line> } EOF
+
+<line> ::= <mainFunction>
+            | <statement>
+            | <proc>
+            | <print>
+            | <while>
+            | <alterFunction>
+            | <moveFunction>
+            | <randomFunction>
+            | <repeat>
+            | <until>
+            | <setupBlock>
+            | <loopBlock>
+             <caseFunction>
+
+<statement> ::= <assignment> SEMI <COMMENT>?
+            | <functionCall> SEMI <COMMENT>?
+            | <reAssignment> SEMI <COMMENT>?
+            | <variable> SEMI <COMMENT>?
+            | <notFunction> SEMI <COMMENT>?
+            | <isTrueFunction> SEMI <COMMENT>?
+            | <print> SEMI <COMMENT>?
+
+<print> ::= '=>' '(' <printExpr> ')'
+<printExpr> ::= <constant> | <variable> | <expression>
+<variable> ::= '@' ID
+<assignment> ::= Def '(' <variable> (',' <type>)? (',' <constant>)? ')'
+<reAssignment> ::= '@' ID '(' <NOT>? (<constant> | '@' ID | ('@' ID | INTEGER) (<addOp> | <multOp>) ('@' ID | INTEGER)) ')'
+<functionCall> ::= Call '(' <expression> ')'
+<notFunction> ::= Not '(' <variable> ')'
+<isTrueFunction> ::= IsTrue '(' '@'? ID ')'
+<alterFunction> ::= Alter '(' <variable> ',' (<INTEGER> | <variable> (<multOp> | <addOp>) <variable> | <variable>) ')'
+<moveFunction> ::= Move '(' <moveOp> ')' SEMI
+<randomFunction> ::= Random '()' SEMI
+<mainFunction> ::= '@' Principal <block>? SEMI
+<proc> ::= Proc ID <block> SEMI
+<while> ::= While <expression> <block> SEMI
+<repeat> ::= Repeat '(' (<expression> | <statement>)* Break ')' SEMI
+<until> ::= Until <block> <expression> SEMI
+<caseFunction> ::= Case 'When' '(' <expression> ')' 'Then' <block> SEMI
+<setupBlock> ::= Setup <block>
+<loopBlock> ::= Loop <block>
+<expression> ::= <constant> | <variable> | <functionCall> | '(' <expression> ')' | <unaryOp> <expression> | <expression> <binaryOp> <expression>
+<binaryOp> ::= <addOp> | <multOp> | <relOp> | <eqOp>
+<unaryOp> ::= <notOp>
+<addOp> ::= '+' | '-'
+<multOp> ::= '*' | '/'
+<relOp> ::= '<' | '>' | '<=' | '>='
+<eqOp> ::= '==' | '!='
+<notOp> ::= '!'
+
+<block> ::= '(' { <line> } ')'
+<while> ::= While <expression> <block> SEMI
+<repeat> ::= Repeat '(' [ <expression> | <statement> ]* Break ')' SEMI
+<until> ::= Until <block> <expression> SEMI
+<proc> ::= Proc ID <block> SEMI
+<assignment> ::= Def '(' <variable> [ ',' <type> ] [ ',' <constant> ]? ')'
+<reAssignment> ::= '@' ID '(' [ NOT? [ <constant> | '@' ID | (('@' ID | INTEGER) <addOp | multOp> ('@' ID | INTEGER)) ] ] ')'
+<functionCall> ::= Call '(' <expression> ')'
+<printExpr> ::= <constant>
+            | <variable>
+            |<expression>
+
+<variable> ::= '@' ID
+<type> ::= 'integer' | 'boolean' | 'string'
+<constant> ::= INTEGER | BOOL | STRING
+<alterFunction> ::= Alter '(' <variable> ',' ( INTEGER | <variable> (<multOp | addOp>) <variable> | <variable> ) ')' SEMI
+<notFunction> ::= Not '(' <variable> ')'
+<isTrueFunction> ::= IsTrue '(' '@'? ID ')'
+<moveFunction> ::= Move '(' <moveOp> ')' SEMI
+<randomFunction> ::= Random '()' SEMI
+<mainFunction> ::= '@' Principal [ <block> ] SEMI
+<caseFunction> ::= Case 'When' '(' <expression> ')' 'Then' <block> SEMI
+<setupBlock> ::= Setup <block> SEMI
+<loopBlock> ::= Loop <block> SEMI
+<print> ::= '=>' '(' [ <printExpr> ( ',' <printExpr> )* ] ')' SEMI
+<multOp> ::= '*' | '/'
+<addOp> ::= '+' | '-'
+<relOp> ::= '==' | '!=' | '<' | '>' | '<=' | '>='
+<moveOp> ::= 'ATR' | 'ADL' | 'ADE' | 'AIZ' | 'IZQ' | 'DER' | 'DDE' | 'DIZ'
+
+<expression> ::= <constant> /* constantExpression /
+        | <variable> / variableExpression /
+        | ID / identifierExpression /
+        | INTEGER / integerExpression /
+        | '(' <expression> ')' / parenthesizedExpression /
+        | Not <expression> / notExpression /
+        | IsTrue <expression> / isTrueExpression /
+        | <alterFunction> / alterExpression /
+        | <expression> <multOp> <expression> / multiplicativeExpression */
